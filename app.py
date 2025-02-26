@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from generatePlantDiseaseInformation import generatePlantDiseaseInformation
 import logging
 import os
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Load configuration from environment variables or default to development
 app.config.from_mapping(
