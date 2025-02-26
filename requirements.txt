@@ -1,6 +1,3 @@
 flask
 google-genai
 waitress
-logging
-os
-base64
