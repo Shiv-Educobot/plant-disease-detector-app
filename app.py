@@ -1,13 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from generatePlantDiseaseInformation import generatePlantDiseaseInformation
+from generatePlantDiseaseInformation import generatePlantDiseaseInformation, generateGeneralResponse
 import logging
 import os
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
-# Load configuration from environment variables or default to development
 app.config.from_mapping(
     DEBUG=os.getenv('FLASK_DEBUG', 'false').lower() in ['true', '1', 't'],
     ENV=os.getenv('FLASK_ENV', 'production')
@@ -27,6 +26,20 @@ def analyse_plant_image():
         base64_image = data['base64_image']
         response = generatePlantDiseaseInformation(base64_image)
         # Process the base64_image as needed
+        return jsonify({'response': response}), 200
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/generate_response', methods=['POST'])
+def generate_response():
+    try:
+        data = request.get_json()
+        if 'text_input' not in data:
+            return jsonify({'error': 'No text_input key in JSON'}), 400
+        
+        text_input = data['text_input']
+        response = generateGeneralResponse(text_input)
         return jsonify({'response': response}), 200
     except Exception as e:
         logger.error(f"Error processing request: {e}")
