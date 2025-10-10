@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from generatePlantDiseaseInformation import generatePlantDiseaseInformation, generateGeneralResponse
+from generatePlantDiseaseInformation import generatePlantDiseaseInformation, generateGeneralResponse, getImageResponse
 import logging
 import os
 
@@ -30,6 +30,28 @@ def analyse_plant_image():
     except Exception as e:
         logger.error(f"Error processing request: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
+
+
+@app.route('/analyze_image', methods=['POST'])
+def analyze_image():
+    try:
+        data = request.get_json()
+        if 'base64_image' not in data:
+            return jsonify({'error': 'No base64_image key in JSON'}), 400
+        
+        base64_image = data['base64_image']
+        prompt = data['prompt'] if 'prompt' in data else "Analyze the image and provide a detailed description of its content and view in the image."
+        response = getImageResponse(base64_image, prompt)
+        # Process the base64_image as needed
+        return jsonify({'response': response}), 200
+    except Exception as e:
+        logger.error(f"Error processing request: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+
+
+
 
 @app.route('/generate_response', methods=['POST'])
 def generate_response():
